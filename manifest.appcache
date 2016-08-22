@@ -1,0 +1,13 @@
+CACHE MANIFEST
+# This manifest was hand crafted and needs to be manually updated
+# Time: Mon Aug 22 23:30:40 AEST 2016
+
+CACHE:
+index.html
+pouchdb.min.js
+
+NETWORK:
+*
+
+SETTINGS:
+prefer-online

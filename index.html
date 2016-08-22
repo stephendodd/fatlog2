@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html manifest="manifest.appcache" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+</head>
+<body>
+  <form>
+    <input id="weight" placeholder="weight" type="number"/>
+    <input id="fat" placeholder="fat" type="number"/>
+    <button id="save">Save</button>
+  </form>
+  <ul id="results">
+  </ul>
+  <script src="./pouchdb.min.js"></script>
+  <script>
+    var db = new PouchDB('test');
+
+    document.getElementById('save').onclick = function(e) {
+      e.preventDefault();
+      db.put({
+        _id: Date.now().toString(),
+        weight: document.getElementById('weight').value,
+        fat: document.getElementById('fat').value
+      });
+
+      db.allDocs({
+        include_docs: true,
+        attachments: true
+      }).then(function (result) {
+        updateList(result);
+      }).catch(function (err) {
+        console.log(err);
+      });
+    };
+
+    db.changes().on('change', function() {
+      console.log('Ch-Ch-Changes');
+    });
+
+    function updateList(result) {
+      var ul = document.getElementById('results');
+      ul.innerHTML = "";
+      result.rows.forEach(function(row) {
+        var li = document.createElement('li');
+        var text = row.doc.fat + ":" + row.doc.weight;
+        li.appendChild(document.createTextNode(text));
+        ul.appendChild(li);
+      });
+    }
+
+    db.allDocs({
+      include_docs: true,
+      attachments: true
+    }).then(function (result) {
+      updateList(result);
+    }).catch(function (err) {
+      console.log(err);
+    });
+
+    var remote = 'https://hisheaskingerhingiamishe:50ea9f6473ecb4a44e2b4893c138a558c00b0293@steveotest.cloudant.com/test';
+    var opts = { continuous: true };
+
+    db.replicate.to(remote, opts);
+    db.replicate.from(remote, opts);
+  </script>
+</body>
+</html>
